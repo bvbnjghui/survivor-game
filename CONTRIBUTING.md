@@ -1,2 +1,70 @@
-專案：Web Survivor - 開發貢獻指南 (CONTRIBUTING.md)歡迎加入 Web Survivor 專案的開發！本專案的核心是極致的效能。我們採用了特定的架構模式來確保遊戲在數百個實體 (Entities) 同時存在時仍能保持流暢。在您開始撰寫任何程式碼之前，請務必閱讀本指南。所有的新功能（無論是人類或 AI 撰寫）都必須嚴格遵守這些核心原則。💥 四大核心原則 (The Golden Rules)這是在此專案中絕對不可妥協的規則：【效能】絕不手動創建/銷毀實體 (No Manual new/destroy)：嚴禁在遊戲迴圈中 (例如 update 裡) 使用 new Enemy() 或 bullet.destroy()。必須使用 ObjectPool.js 提供的物件池 (e.g., pools.enemy.get(), pools.bullet.release(bullet))。理由： 避免觸發 JavaScript 的「垃圾回收 (GC)」，GC 會導致遊戲畫面凍結。【效能】絕不使用 $O(n^2)$ 碰撞 (No Naive Collision)：嚴禁使用「雙重 for 迴圈」來檢查所有子彈 vs 所有敵人。必須使用 SpatialHashGrid.js 提供的空間雜湊網格 (e.g., grid.query(entity)) 來獲取「附近的」實體，然後只對這些實體進行碰撞檢查。理由： 1000 個敵人 vs 500 個子彈的 $O(n^2)$ 檢查是 $500,000$ 次，會立即癱瘓遊戲。【架構】保持資料導向 (Stay Data-Oriented)：不要在「實體」物件 (e.g., enemy) 中加入複雜的 update() 方法。「實體」應只包含資料（e.g., position, health, stats）。「邏輯」應存在於 /src/systems/ 中的「系統」檔案（e.g., EnemyAISystem.js）。系統會迭代所有實體並處理它們。【架構】內容由資料驅動 (Content is Data-Driven)：不要在程式邏輯中「硬編碼 (Hardcode)」一個新武器的數值。必須在 /src/data/ 資料夾中定義新的內容（e.g., weaponTypes.js, enemyTypes.js）。系統會讀取這些資料來運作。🚀 快速上手 (Development Setup)Clone 專案安裝依賴啟動開發伺服器📖 專案架構概覽📝 "How-To" 指南：如何貢獻新功能這是本文件的核心。當你需要添加新功能時，請遵循以下步驟。任務 1：如何新增一個「新敵人」 (e.g., 哥布林 Goblin)新增資產 (Asset)：將 goblin.png 圖片放入 /assets/sprites/ 資料夾。預載入資產 (Preload)：(假設有 AssetLoader.js 或在 Game.js 中) 添加資產路徑以便 PixiJS 載入。定義敵人資料 (Data)：開啟 src/data/enemyTypes.js。在 ENEMY\_TYPES 物件中新增一個 key：加入生成邏輯 (Spawning)：開啟 src/systems/EnemySpawnerSystem.js。在生成邏輯中 (例如 spawnWave 函數)，將 'goblin' 加入到可能生成的敵人陣列中。更新物件池 (Object Pool)：開啟 src/core/Game.js (或管理 Pool 的地方)。找到 createEnemy 函數（傳遞給 ObjectPool 的工廠函數）。確保此函數能根據傳入的 type（例如 'goblin'）正確地從 ENEMY\_TYPES 讀取資料，並設定 PIXI.Sprite 的紋理 (texture) 和實體的初始狀態。（進階）自訂 AI：如果 goblin 只是追蹤玩家，EnemyAISystem.js 應該能自動處理它。如果 goblin 有特殊邏輯（例如：它會停下並射擊），請不要在 EnemyAISystem.js 中加入 if (enemy.type === 'goblin')。正確做法：在 enemyTypes.js 中為 goblin 添加一個新屬性：aiType: 'shooter'。建立一個新的系統 EnemyShootingSystem.js，它只會迭代所有 aiType === 'shooter' 的敵人並執行射擊邏輯（當然，射擊的子彈也必須來自物件池）。任務 2：如何新增一個「新武器」 (e.g., 聖水 Holy Water)新增資產 (Assets)：將 holy-water-icon.png (UI 介面) 放入 /assets/icons/。將 holy-water-effect.png (遊戲中效果) 放入 /assets/sprites/。定義武器資料 (Data)：開啟 src/data/weaponTypes.js。新增一個 key：加入升級池 (Upgrade Pool)：開啟 src/systems/UpgradeSystem.js (或管理升級的地方)。將 'holyWater' 加入到玩家「等級 1」時可能抽到的武器清單中。實作武器邏輯 (System Logic)：這是最關鍵的一步。開啟 src/systems/WeaponSystem.js。在 update() 迴圈中，它會迭代玩家持有的所有武器。你需要為 type: 'area' 添加處理邏輯：實作碰撞/效果邏輯 (Collision Logic)：holyWater 的效果 (持續傷害) 不是由 WeaponSystem 處理的，而是由 CollisionSystem。開啟 src/systems/CollisionSystem.js。在 update() 中，除了檢查「子彈 vs 敵人」，你現在還需要：查詢 SpatialHashGrid，找出所有 type === 'areaEffect' 的實體。對於每個 areaEffect，再次查詢 SpatialHashGrid 找出「其範圍內的敵人」。對範圍內的敵人施加傷害（注意：可能需要一個計時器來處理持續傷害，而不是每幀都傷）。同時，你需要一個系統 (可能是 MovementSystem 或 EffectSystem) 來處理 areaEffect 的 duration，當 duration <= 0 時，將其 release() 回物件池。提交您的變更 (Submitting Changes)Fork 本專案。建立一個新的 Feature 分支 (e.g., feature/add-goblin-enemy)。Commit 您的變更。請撰寫清晰的 Commit 訊息。Push 到您的分支。開啟一個 Pull Request (PR)。在 PR 的描述中，請簡要說明您新增了什麼，並確認您已遵守本文件的四大核心原則。謝謝您的貢獻！
+# 專案：Web Survivor - 開發貢獻指南 (CONTRIBUTING.md)
 
+歡迎加入 Web Survivor 專案的開發！本專案的核心是極致的效能。我們採用了特定的架構模式來確保遊戲在數百個實體 (Entities) 同時存在時仍能保持流暢。在您開始撰寫任何程式碼之前，請務必閱讀本指南。所有的新功能（無論是人類或 AI 撰寫）都必須嚴格遵守這些核心原則。
+
+## 💥 四大核心原則 (The Golden Rules)
+
+這是在此專案中絕對不可妥協的規則：
+
+### 【效能】絕不手動創建/銷毀實體 (No Manual new/destroy)
+- 嚴禁在遊戲迴圈中 (例如 update 裡) 使用 `new Enemy()` 或 `bullet.destroy()`。
+- 必須使用 `ObjectPool.js` 提供的物件池 (e.g., `pools.enemy.get()`, `pools.bullet.release(bullet)`)。
+- 理由：避免觸發 JavaScript 的「垃圾回收 (GC)」，GC 會導致遊戲畫面凍結。
+
+### 【效能】絕不使用 $O(n^2)$ 碰撞 (No Naive Collision)
+- 嚴禁使用「雙重 for 迴圈」來檢查所有子彈 vs 所有敵人。
+- 必須使用 `SpatialHashGrid.js` 提供的空間雜湊網格 (e.g., `grid.query(entity)`) 來獲取「附近的」實體，然後只對這些實體進行碰撞檢查。
+- 理由：1000 個敵人 vs 500 個子彈的 $O(n^2)$ 檢查是 $500,000$ 次，會立即癱瘓遊戲。
+
+### 【架構】保持資料導向 (Stay Data-Oriented)
+- 不要在「實體」物件 (e.g., enemy) 中加入複雜的 `update()` 方法。
+- 「實體」應只包含資料（e.g., position, health, stats）。
+- 「邏輯」應存在於 `/src/systems/` 中的「系統」檔案（e.g., `EnemyAISystem.js`）。系統會迭代所有實體並處理它們。
+
+### 【架構】內容由資料驅動 (Content is Data-Driven)
+- 不要在程式邏輯中「硬編碼 (Hardcode)」一個新武器的數值。
+- 必須在 `/src/data/` 資料夾中定義新的內容（e.g., `weaponTypes.js`, `enemyTypes.js`）。系統會讀取這些資料來運作。
+
+## 🚀 快速上手 (Development Setup)
+
+- Clone 專案
+- 安裝依賴
+- 啟動開發伺服器
+
+## 📖 專案架構概覽
+
+## 📝 "How-To" 指南：如何貢獻新功能
+
+這是本文件的核心。當你需要添加新功能時，請遵循以下步驟。
+
+### 任務 1：如何新增一個「新敵人」 (e.g., 哥布林 Goblin)
+
+- **新增資產 (Asset)**：將 `goblin.png` 圖片放入 `/assets/sprites/` 資料夾。
+- **預載入資產 (Preload)**：(假設有 `AssetLoader.js` 或在 `Game.js` 中) 添加資產路徑以便 PixiJS 載入。
+- **定義敵人資料 (Data)**：開啟 `src/data/enemyTypes.js`。在 `ENEMY_TYPES` 物件中新增一個 key：
+- **加入生成邏輯 (Spawning)**：開啟 `src/systems/EnemySpawnerSystem.js`。在生成邏輯中 (例如 `spawnWave` 函數)，將 `'goblin'` 加入到可能生成的敵人陣列中。
+- **更新物件池 (Object Pool)**：開啟 `src/core/Game.js` (或管理 Pool 的地方)。找到 `createEnemy` 函數（傳遞給 `ObjectPool` 的工廠函數）。確保此函數能根據傳入的 `type`（例如 `'goblin'`）正確地從 `ENEMY_TYPES` 讀取資料，並設定 `PIXI.Sprite` 的紋理 (texture) 和實體的初始狀態。
+- **(進階) 自訂 AI**：如果 goblin 只是追蹤玩家，`EnemyAISystem.js` 應該能自動處理它。如果 goblin 有特殊邏輯（例如：它會停下並射擊），請不要在 `EnemyAISystem.js` 中加入 `if (enemy.type === 'goblin')`。正確做法：在 `enemyTypes.js` 中為 goblin 添加一個新屬性：`aiType: 'shooter'`。建立一個新的系統 `EnemyShootingSystem.js`，它只會迭代所有 `aiType === 'shooter'` 的敵人並執行射擊邏輯（當然，射擊的子彈也必須來自物件池）。
+
+### 任務 2：如何新增一個「新武器」 (e.g., 聖水 Holy Water)
+
+- **新增資產 (Assets)**：將 `holy-water-icon.png` (UI 介面) 放入 `/assets/icons/`。將 `holy-water-effect.png` (遊戲中效果) 放入 `/assets/sprites/`。
+- **定義武器資料 (Data)**：開啟 `src/data/weaponTypes.js`。新增一個 key：
+- **加入升級池 (Upgrade Pool)**：開啟 `src/systems/UpgradeSystem.js` (或管理升級的地方)。將 `'holyWater'` 加入到玩家「等級 1」時可能抽到的武器清單中。
+- **實作武器邏輯 (System Logic)**：這是最關鍵的一步。開啟 `src/systems/WeaponSystem.js`。在 `update()` 迴圈中，它會迭代玩家持有的所有武器。你需要為 `type: 'area'` 添加處理邏輯：
+- **實作碰撞/效果邏輯 (Collision Logic)**：holyWater 的效果 (持續傷害) 不是由 `WeaponSystem` 處理的，而是由 `CollisionSystem`。開啟 `src/systems/CollisionSystem.js`。在 `update()` 中，除了檢查「子彈 vs 敵人」，你現在還需要：
+  - 查詢 `SpatialHashGrid`，找出所有 `type === 'areaEffect'` 的實體。
+  - 對於每個 `areaEffect`，再次查詢 `SpatialHashGrid` 找出「其範圍內的敵人」。
+  - 對範圍內的敵人施加傷害（注意：可能需要一個計時器來處理持續傷害，而不是每幀都傷）。
+  - 同時，你需要一個系統 (可能是 `MovementSystem` 或 `EffectSystem`) 來處理 `areaEffect` 的 `duration`，當 `duration <= 0` 時，將其 `release()` 回物件池。
+
+## 提交您的變更 (Submitting Changes)
+
+- Fork 本專案。
+- 建立一個新的 Feature 分支 (e.g., `feature/add-goblin-enemy`)。
+- Commit 您的變更。請撰寫清晰的 Commit 訊息。
+- Push 到您的分支。
+- 開啟一個 Pull Request (PR)。
+- 在 PR 的描述中，請簡要說明您新增了什麼，並確認您已遵守本文件的四大核心原則。
+
+謝謝您的貢獻！

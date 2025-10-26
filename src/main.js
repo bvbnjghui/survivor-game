@@ -53,11 +53,7 @@ window.onload = async () => {
 
     // Update button event listeners
     document.getElementById('update-now')?.addEventListener('click', () => {
-        const registration = navigator.serviceWorker.controller;
-        if (registration?.waiting) {
-            registration.waiting.postMessage({ type: 'SKIP_WAITING' });
-            window.location.reload();
-        }
+        window.location.reload();
     });
 
     document.getElementById('update-later')?.addEventListener('click', () => {

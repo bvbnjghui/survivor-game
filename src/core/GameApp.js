@@ -1,7 +1,7 @@
 // src/core/GameApp.js
 import { Game } from './Game.js';
 
-const VERSION = '0.1.2';
+const VERSION = '0.1.3';
 
 /**
  * 頂層應用程式管理器

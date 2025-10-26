@@ -14,6 +14,9 @@ export class GameApp {
         this.app = null;
         this.currentGame = null; // 當前遊戲會話的實例
         this.uiContainer = null; // 用於菜單的 HTML 容器
+
+        this.loadingScreen = document.getElementById('loading-screen');
+        this.inGameUI = document.getElementById('ui');
     }
 
     async init() {
@@ -39,6 +42,10 @@ export class GameApp {
 
     showMainMenu() {
         this.clearUI();
+
+        if (this.loadingScreen) this.loadingScreen.style.display = 'none';
+        if (this.inGameUI) this.inGameUI.style.display = 'none';
+
         const menu = this.createMenuElement('main-menu', [
             { text: 'Web Survivor', isTitle: true },
             { text: 'Start Game', action: () => this.startGame() },
@@ -49,6 +56,9 @@ export class GameApp {
 
     showPauseMenu() {
         this.clearUI();
+
+        if (this.inGameUI) this.inGameUI.style.display = 'none';
+
         const menu = this.createMenuElement('pause-menu', [
             { text: 'Paused', isTitle: true },
             { text: 'Resume Game', action: () => this.currentGame?.resumeInGame() },
@@ -60,6 +70,9 @@ export class GameApp {
     
     showGameOverMenu(score) {
         this.clearUI();
+
+        if (this.inGameUI) this.inGameUI.style.display = 'none';
+
         const menu = this.createMenuElement('game-over-menu', [
             { text: 'Game Over', isTitle: true },
             { text: `Final Score: ${score}`, isStatic: true },
@@ -96,6 +109,8 @@ export class GameApp {
     startGame() {
         this.clearUI();
         this.destroyCurrentGame(); // 清理舊的
+
+        if (this.inGameUI) this.inGameUI.style.display = 'block';
         
         this.currentGame = new Game(this.app, this); // 建立新的
         this.currentGame.init(); // 初始化遊戲會話
@@ -108,6 +123,9 @@ export class GameApp {
     returnToMenu() {
         this.clearUI();
         this.destroyCurrentGame();
+        
+        if (this.inGameUI) this.inGameUI.style.display = 'none';
+
         this.showMainMenu();
     }
 

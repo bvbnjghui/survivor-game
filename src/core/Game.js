@@ -446,6 +446,10 @@ export class Game {
     resumeInGame() {
         this.gameState = 'PLAYING';
         this.gameApp.clearUI(); // 呼叫 GameApp 清除 UI
+
+        if (this.gameApp.inGameUI) {
+            this.gameApp.inGameUI.style.display = 'block';
+        }
     }
 
     // 升級時觸發

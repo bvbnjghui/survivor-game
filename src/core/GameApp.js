@@ -1,6 +1,8 @@
 // src/core/GameApp.js
 import { Game } from './Game.js';
 
+const VERSION = '0.1.0';
+
 /**
  * 頂層應用程式管理器
  * 負責：
@@ -48,6 +50,7 @@ export class GameApp {
 
         const menu = this.createMenuElement('main-menu', [
             { text: 'Web Survivor', isTitle: true },
+            { text: `Version ${VERSION}`, isStatic: true },
             { text: 'Start Game', action: () => this.startGame() },
             { text: 'High Scores', action: () => this.showHighScores() }
         ]);

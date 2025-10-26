@@ -8,8 +8,22 @@ export class Enemy {
     static create(app, entityManager, typeKey, typeData, targetEntityId) {
         const entityId = entityManager.createEntity();
 
-        // ▼▼▼ 3. 使用 getEnemyTexture 和 typeData 創建 Sprite ▼▼▼
-        const texture = getEnemyTexture(app, typeData);
+        let texture;
+        
+        // 檢查 typeData 中是否有 assetPath 屬性
+        if (typeData.assetPath) {
+            // 如果有，從 PIXI 資產快取中獲取 (必須已在 GameApp.js 預載入)
+            try {
+                texture = PIXI.Assets.get(typeData.assetPath);
+            } catch (e) {
+                console.warn(`Failed to get asset: ${typeData.assetPath}. Using fallback texture.`);
+                // 如果獲取失敗 (例如路徑錯誤)，使用 fallback
+                texture = getEnemyTexture(app, typeData);
+            }
+        } else {
+            // 如果沒有定義 assetPath，使用 fallback
+            texture = getEnemyTexture(app, typeData);
+        }
 
         // ▼▼▼ 4. 使用 typeData 設定元件 ▼▼▼
         entityManager.addComponent(entityId, Position, new Position(0, 0)); // (spawn時設定)

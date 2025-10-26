@@ -42,6 +42,7 @@ function getEnemyTexture(app, typeData) {
 export const ENEMY_TYPES = {
     'bat': {
         name: 'Bat',
+        assetPath: 'assets/sprites/bat.png',
         health: 50,      // 血量
         speed: 100,      // 移動速度 (pixels/sec)
         color: 0xff0000, // 紅色 (目前敵人)
@@ -53,6 +54,7 @@ export const ENEMY_TYPES = {
     },
     'goblin': {
         name: 'Goblin',
+        assetPath: 'assets/sprites/goblin.png',
         health: 100,     // 血量較多
         speed: 75,       // 速度較慢
         color: 0x008000, // 綠色

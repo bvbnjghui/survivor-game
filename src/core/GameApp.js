@@ -1,7 +1,7 @@
 // src/core/GameApp.js
 import { Game } from './Game.js';
 
-const VERSION = '0.1.1';
+const VERSION = '0.1.2';
 
 /**
  * 頂層應用程式管理器
@@ -32,8 +32,11 @@ export class GameApp {
         document.body.appendChild(this.app.canvas);
 
         try {
-            // 假設您的玩家貼圖路徑如下
-            await PIXI.Assets.load('assets/sprites/player.png');
+            await PIXI.Assets.load([
+                'assets/sprites/player.png',
+                'assets/sprites/goblin.png', // <-- 新增
+                'assets/sprites/bat.png'     // <-- 新增
+            ]);
             // (未來您可以在此處載入所有其他資源，例如敵人、音效等)
         } catch (e) {
             console.error("Error loading assets:", e);

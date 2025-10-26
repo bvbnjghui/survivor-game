@@ -1,7 +1,7 @@
 // src/core/GameApp.js
 import { Game } from './Game.js';
 
-const VERSION = '0.1.0';
+const VERSION = '0.1.1';
 
 /**
  * 頂層應用程式管理器
@@ -30,6 +30,17 @@ export class GameApp {
             background: 0x000000
         });
         document.body.appendChild(this.app.canvas);
+
+        try {
+            // 假設您的玩家貼圖路徑如下
+            await PIXI.Assets.load('assets/sprites/player.png');
+            // (未來您可以在此處載入所有其他資源，例如敵人、音效等)
+        } catch (e) {
+            console.error("Error loading assets:", e);
+            // (可選) 顯示一個錯誤畫面
+            this.loadingScreen.innerHTML = '<h1>Error loading assets. Please refresh.</h1>';
+            return; // 停止初始化
+        }
 
         // 2. 建立 UI 容器
         this.uiContainer = document.createElement('div');

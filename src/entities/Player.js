@@ -9,13 +9,7 @@ export class Player {
     static create(app, entityManager, x = 400, y = 300) {
         const entityId = entityManager.createEntity();
 
-        // 創建一個簡單的彩色矩形作為玩家 sprite
-        const graphics = new PIXI.Graphics();
-        graphics.beginFill(0x00ff00); // 綠色
-        graphics.drawRect(0, 0, 32, 32);
-        graphics.endFill();
-        const texture = PIXI.RenderTexture.create({ width: 32, height: 32 });
-        app.renderer.render(graphics, { renderTexture: texture });
+        const texture = PIXI.Assets.get('assets/sprites/player.png');
 
         entityManager.addComponent(entityId, Position, new Position(x, y));
         entityManager.addComponent(entityId, Velocity, new Velocity(0, 0));

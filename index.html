@@ -28,12 +28,47 @@
         #ui {
             display: none;
             position: absolute;
-            top: 10px;
-            left: 10px;
+            top: 0;
+            left: 0;
             color: white;
             font-family: Arial, sans-serif;
             font-size: 18px;
             z-index: 1000;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+        }
+
+        #status-bars{
+            padding: 10px;
+        }
+
+        #pause-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            border-radius: 8px;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 1001;
+            /* 畫兩條線來模擬 "||" */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+        #pause-button::before,
+        #pause-button::after {
+            content: '';
+            width: 6px;
+            height: 25px;
+            background: white;
         }
 
         #health-bar {
@@ -332,15 +367,18 @@
         <h1>Loading...</h1>
     </div>
     <div id="ui">
-        <div id="health-bar">
-            <div id="health-fill"></div>
+        <button id="pause-button"></button>
+        <div id="status-bars">
+            <div id="health-bar">
+                <div id="health-fill"></div>
+            </div>
+            
+            <div id="xp-bar">
+                <div id="xp-fill"></div>
+                <div id="xp-label">LVL: 1</div>
+            </div>
+            <div id="score">Score: 0</div>
         </div>
-        
-        <div id="xp-bar">
-            <div id="xp-fill"></div>
-            <div id="xp-label">LVL: 1</div>
-        </div>
-        <div id="score">Score: 0</div>
     </div>
     <div id="joystick-zone"></div>
 

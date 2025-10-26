@@ -1,7 +1,7 @@
 // src/core/GameApp.js
 import { Game } from './Game.js';
 
-const VERSION = '0.1.3';
+const VERSION = '0.1.4';
 
 /**
  * 頂層應用程式管理器
@@ -19,6 +19,9 @@ export class GameApp {
 
         this.loadingScreen = document.getElementById('loading-screen');
         this.inGameUI = document.getElementById('ui');
+
+        this.pauseButton = null;
+        this.pauseButtonListener = null;
     }
 
     async init() {
@@ -125,12 +128,26 @@ export class GameApp {
 
     startGame() {
         this.clearUI();
-        this.destroyCurrentGame(); // 清理舊的
+        this.destroyCurrentGame(); // (這會清理舊的 pauseButton 監聽器)
 
         if (this.inGameUI) this.inGameUI.style.display = 'block';
         
-        this.currentGame = new Game(this.app, this); // 建立新的
-        this.currentGame.init(); // 初始化遊戲會話
+        this.currentGame = new Game(this.app, this);
+        this.currentGame.init();
+
+        // ▼▼▼ (新增) 綁定暫停按鈕 ▼▼▼
+        this.pauseButton = document.getElementById('pause-button');
+        if (this.pauseButton) {
+            // 建立一個 *新* 的監聽器
+            this.pauseButtonListener = () => {
+                // 確保 currentGame 存在
+                if (this.currentGame) {
+                    this.currentGame.togglePause();
+                }
+            };
+            this.pauseButton.addEventListener('click', this.pauseButtonListener);
+        }
+        // ▲▲▲
     }
     
     restartGame() {
@@ -150,6 +167,12 @@ export class GameApp {
         if (this.currentGame) {
             this.currentGame.destroy();
             this.currentGame = null;
+        }
+
+        if (this.pauseButton && this.pauseButtonListener) {
+            this.pauseButton.removeEventListener('click', this.pauseButtonListener);
+            this.pauseButtonListener = null;
+            this.pauseButton = null;
         }
     }
 

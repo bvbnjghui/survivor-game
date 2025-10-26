@@ -37,6 +37,7 @@ export class Game {
         this.movementSystem = null;
         this.collisionSystem = null;
         this.renderSystem = null; 
+        this.playerInputSystem = null;
         
         this.upgradeSystem = null; 
         
@@ -172,10 +173,11 @@ export class Game {
         this.movementSystem = new MovementSystem(this.entityManager, this.worldWidth, this.worldHeight);
         this.collisionSystem = new CollisionSystem(this.entityManager, this, this.spatialGrid);
         this.renderSystem = new RenderSystem(this.entityManager, this.world);
+        this.playerInputSystem = new PlayerInputSystem(this.entityManager, this);
 
         // 初始化所有 Systems
         this.systems = [
-            new PlayerInputSystem(this.entityManager, this),
+            this.playerInputSystem,
             new EnemyAISystem(this.entityManager),
             // ▼▼▼ 2. 將邊界傳遞給 MovementSystem ▼▼▼
             this.movementSystem, // (使用引用)
@@ -555,17 +557,23 @@ export class Game {
         // 1. 停止 Ticker
         this.app.ticker.remove(this.updateLoop);
 
-        // 2. 清除所有系統和實體
+        // ▼▼▼ (修改) 2. 銷毀需要清理的系統 ▼▼▼
+        if (this.playerInputSystem) {
+            this.playerInputSystem.destroy(); // <-- (關鍵) 呼叫 destroy
+        }
+        // ▲▲▲
+
+        // 3. 清除所有系統和實體
         this.systems = [];
         this.entityManager.destroyAllEntities();
         
-        // 3. (可選) 清空物件池
+        // 4. 清空物件池
         this.enemyPools.clear();
         this.bulletPool = null;
         this.experienceOrbPool = null;
         this.areaHitboxPool = null;
 
-        // 4. 從 PIXI 移除 World Container
+        // 5. 從 PIXI 移除 World Container
         this.app.stage.removeChild(this.world);
         this.world.destroy({ children: true });
         

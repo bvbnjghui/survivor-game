@@ -13,48 +13,48 @@ export class PlayerInputSystem {
         this.isJoystickActive = false;
         // ▲▲▲ 儲存完畢 ▲▲▲
 
+        this.nippleManager = null;
+        // 將監聽函式綁定到 'this'，以便之後能正確移除
+        this.keydownListener = this.handleKeydown.bind(this);
+        this.keyupListener = this.handleKeyup.bind(this);
+
         this.setupInput();
         this.setupJoystick(); // <-- 呼叫新的函式
     }
 
+    // ▼▼▼ 2. (修改) 拆分監聽器邏輯 ▼▼▼
     setupInput() {
-        // ... (鍵盤監聽 保持不變) ...
-        window.addEventListener('keydown', (e) => {
-            this.keys[e.code] = true;
-            if (e.code === 'Escape') {
-                e.preventDefault(); 
-                this.game.togglePause();
-            }
-        });
-        window.addEventListener('keyup', (e) => {
-            this.keys[e.code] = false;
-        });
+        // 使用儲存的監聽器
+        window.addEventListener('keydown', this.keydownListener);
+        window.addEventListener('keyup', this.keyupListener);
     }
 
-    // ▼▼▼ 3. (新增) 設置 NippleJS 虛擬搖桿 ▼▼▼
+    handleKeydown(e) {
+        this.keys[e.code] = true;
+        if (e.code === 'Escape') {
+            e.preventDefault(); 
+            this.game.togglePause();
+        }
+    }
+
+    handleKeyup(e) {
+        this.keys[e.code] = false;
+    }
+
     setupJoystick() {
         // ▼▼▼ 1. (修改) 將 zone 改為 document.body ▼▼▼
         const zone = document.body;
-        // (移除 if (!zone) ... 的檢查)
-
+        
         const options = {
             zone: zone,
-            // ▼▼▼ 2. (修改) 模式改為 'dynamic' ▼▼▼
-            // 這會讓搖桿的中心點在您手指按下的位置
             mode: 'dynamic', 
-            
-            // ▼▼▼ 3. (移除) 移除靜態模式的選項 ▼▼▼
-            // position: { ... }, // <-- 刪除
-            // color: 'white',      // <-- 刪除
-            // size: 100,           // <-- 刪除
-
             threshold: 0.1 
         };
         
-        const manager = nipplejs.create(options);
+        // ▼▼▼ 3. (修改) 儲存 manager ▼▼▼
+        this.nippleManager = nipplejs.create(options);
 
-        // (監聽 'move' 和 'end' 的邏輯 ... 保持不變)
-        manager.on('move', (evt, data) => {
+        this.nippleManager.on('move', (evt, data) => {
             if (data.vector) {
                 this.joystickVector.x = data.vector.x;
                 this.joystickVector.y = -data.vector.y; 
@@ -62,13 +62,12 @@ export class PlayerInputSystem {
             }
         });
 
-        manager.on('end', () => {
+        this.nippleManager.on('end', () => {
             this.joystickVector.x = 0;
             this.joystickVector.y = 0;
             this.isJoystickActive = false;
         });
     }
-    // ▲▲▲ 新增完畢 ▲▲▲
 
     // ▼▼▼ 4. (重構) update 函式 ▼▼▼
     update(delta) {
@@ -113,5 +112,21 @@ export class PlayerInputSystem {
             velocity.vy = input.moveY * speed;
         }
     }
-    // ▲▲▲ 重構完畢 ▲▲▲
+    
+    /**
+     * 清理此系統綁定的所有 DOM 監聽器
+     */
+    destroy() {
+        // 移除 NippleJS 實例
+        if (this.nippleManager) {
+            this.nippleManager.destroy();
+            this.nippleManager = null;
+        }
+
+        // 移除鍵盤監聽器
+        window.removeEventListener('keydown', this.keydownListener);
+        window.removeEventListener('keyup', this.keyupListener);
+        
+        console.log("PlayerInputSystem destroyed.");
+    }
 }

@@ -155,6 +155,109 @@
             /* 將搖桿設為完全透明來隱藏它 */
             opacity: 0 !important;
         }
+
+        .upgrade-title {
+            font-size: 32px; /* 預設標題大小 */
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .upgrade-options-container {
+            display: flex;
+            flex-direction: column; /* 垂直排列 */
+            gap: 20px;
+        }
+
+        .upgrade-button {
+            width: 280px; /* 預設按鈕寬度 */
+            padding: 20px;
+            background: #333;
+            color: white;
+            border: 2px solid #eee;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: Arial, sans-serif;
+            text-align: left;
+            transition: background 0.2s, border-color 0.2s;
+        }
+
+        /* :hover 效果取代了 JS 中的 onmouseenter/onmouseleave */
+        .upgrade-button:hover {
+            background: #555;
+            border-color: #00ffff;
+        }
+
+        .upgrade-button h3 {
+            margin: 0 0 10px 0;
+            color: #00ffff;
+            font-size: 20px; /* 預設按鈕標題 */
+        }
+
+        .upgrade-button p {
+            margin: 0;
+            font-size: 16px; /* 預設按鈕描述 */
+        }
+        /* ▲▲▲ 升級畫面樣式結束 ▲▲▲ */
+
+
+        /* ▼▼▼ 新增 遊戲結束畫面靜態文字樣式 ▼▼▼ */
+        .menu-static-text {
+            font-size: 24px;
+            margin: 10px 0;
+        }
+        /* ▲▲▲ 樣式結束 ▲▲▲ */
+
+
+        /* ▼▼▼ (核心) Media Query for Mobile ▼▼▼ */
+        /* 適用於手機等小螢幕 (寬度小於 768px) */
+        @media (max-width: 768px) {
+
+            /* 1. 加大主選單 */
+            .menu-title {
+                font-size: 40px; /* 手機上的標題 */
+            }
+
+            .menu-button {
+                width: 80vw; /* 佔螢幕寬度的 80% */
+                max-width: 350px;
+                padding: 20px;
+                font-size: 24px;
+            }
+            
+            .menu-static-text {
+                font-size: 28px; /* 加大 Game Over 分數 */
+            }
+            
+            .score-list {
+                width: 80vw;
+                max-width: 350px;
+                font-size: 22px;
+            }
+
+            /* 2. 加大升級畫面 */
+            .upgrade-title {
+                font-size: 28px; /* 手機上的升級標題 */
+                text-align: center;
+            }
+
+            .upgrade-options-container {
+                gap: 15px;
+            }
+
+            .upgrade-button {
+                width: 85vw; /* 佔螢幕寬度的 85% */
+                max-width: 400px;
+                padding: 20px;
+            }
+
+            .upgrade-button h3 {
+                font-size: 22px; /* 手機上的按鈕標題 */
+            }
+
+            .upgrade-button p {
+                font-size: 18px; /* 手機上的按鈕描述 */
+            }
+        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/nipplejs/0.10.1/nipplejs.min.js"></script>
 </head>

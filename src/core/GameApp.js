@@ -123,7 +123,7 @@ export class GameApp {
     returnToMenu() {
         this.clearUI();
         this.destroyCurrentGame();
-        
+
         if (this.inGameUI) this.inGameUI.style.display = 'none';
 
         this.showMainMenu();
@@ -175,6 +175,7 @@ export class GameApp {
                 menu.appendChild(title);
             } else if (item.isStatic) {
                 const text = document.createElement('p');
+                text.className = 'menu-static-text';
                 text.textContent = item.text;
                 menu.appendChild(text);
             } else {

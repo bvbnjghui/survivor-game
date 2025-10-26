@@ -11,7 +11,7 @@ window.onload = async () => {
     // Register service worker for PWA
     if ('serviceWorker' in navigator) {
         try {
-            const registration = await navigator.serviceWorker.register('/sw.js');
+            const registration = await navigator.serviceWorker.register('/survivor-game/sw.js');
             console.log('Service Worker registered successfully:', registration);
 
             // Check for updates

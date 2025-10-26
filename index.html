@@ -212,6 +212,67 @@
         }
         /* ▲▲▲ 樣式結束 ▲▲▲ */
 
+        /* ▼▼▼ PWA Update Notification ▼▼▼ */
+        #update-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            border: 2px solid #00ffff;
+            font-family: Arial, sans-serif;
+            font-size: 16px;
+            z-index: 9999;
+            display: none;
+            max-width: 300px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        #update-notification h3 {
+            margin: 0 0 10px 0;
+            color: #00ffff;
+            font-size: 18px;
+        }
+
+        #update-notification p {
+            margin: 0 0 15px 0;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .update-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .update-btn {
+            padding: 8px 16px;
+            border: 1px solid #00ffff;
+            background: transparent;
+            color: #00ffff;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .update-btn:hover {
+            background: #00ffff;
+            color: black;
+        }
+
+        .update-btn.later {
+            border-color: #666;
+            color: #666;
+        }
+
+        .update-btn.later:hover {
+            background: #666;
+            color: white;
+        }
+        /* ▲▲▲ PWA Update Notification ▲▲▲ */
 
         /* ▼▼▼ (核心) Media Query for Mobile ▼▼▼ */
         /* 適用於手機等小螢幕 (寬度小於 768px) */
@@ -282,6 +343,17 @@
         <div id="score">Score: 0</div>
     </div>
     <div id="joystick-zone"></div>
+
+    <!-- PWA Update Notification -->
+    <div id="update-notification">
+        <h3>🎮 遊戲更新</h3>
+        <p>新版本已準備就緒！是否要立即更新以獲得最新功能和修復？</p>
+        <div class="update-buttons">
+            <button class="update-btn" id="update-now">立即更新</button>
+            <button class="update-btn later" id="update-later">稍後</button>
+        </div>
+    </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/8.0.0/pixi.min.js"></script>
     <script src="src/main.js" type="module"></script>
 </body>

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Web Survivor</title>
+    <style>
+        html, body { 
+            margin: 0; 
+            padding: 0; 
+            background: #000;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* 隱藏捲軸 */
+        }
+        
+        /* ▼▼▼ 修改點 2：讓 canvas 填滿 body ▼▼▼ */
+        canvas { 
+            display: block; 
+            width: 100%;
+            height: 100%;
+        }
+        /* ▲▲▲ 修改完畢 ▲▲▲ */
+
+        #ui {
+            /* (UI 樣式保持不變) */
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: white;
+            font-family: Arial, sans-serif;
+            font-size: 18px;
+            z-index: 1000;
+        }
+
+        #health-bar {
+            width: 200px;
+            height: 20px;
+            background-color: #333;
+            border: 2px solid #fff;
+            margin-bottom: 10px;
+        }
+
+        #health-fill {
+            height: 100%;
+            background-color: #f00;
+            width: 100%;
+            transition: width 0.3s ease;
+        }
+
+        /* ▼▼▼ 加入以下 XP Bar 樣式 ▼▼▼ */
+        #xp-bar {
+            width: 200px;
+            height: 14px;
+            background-color: #333; /* border: 2px solid #fff; */
+            margin-bottom: 10px;
+            position: relative; /* 為了容納標籤 */
+        }
+
+        #xp-fill {
+            height: 100%;
+            background-color: #00ffff; /* 青色 */
+            width: 0%; /* 預設 0% */
+            transition: width 0.3s ease;
+        }
+        
+        #xp-label {
+            position: absolute;
+            top: 0;
+            left: 5px;
+            color: white;
+            font-size: 10px;
+            line-height: 14px;
+        }
+        /* ▲▲▲ XP 樣式結束 ▲▲▲ */
+
+        #score {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .ui-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 2000;
+            font-family: Arial, sans-serif;
+            color: white;
+        }
+
+        .ui-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .menu-title {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px #ff0000;
+        }
+
+        .menu-button {
+            padding: 15px 30px;
+            font-size: 24px;
+            background: #444;
+            border: 2px solid #eee;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 250px;
+            text-align: center;
+        }
+        .menu-button:hover {
+            background: #666;
+            border-color: #00ffff;
+        }
+
+        .score-list {
+            list-style: none;
+            padding: 0;
+            font-size: 20px;
+            text-align: center;
+            min-width: 250px;
+        }
+        .score-list li {
+            padding: 5px;
+            background: #222;
+            margin-bottom: 5px;
+        }
+        .nipple {
+            /* 將搖桿設為完全透明來隱藏它 */
+            opacity: 0 !important;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/nipplejs/0.10.1/nipplejs.min.js"></script>
+</head>
+<body>
+    <div id="ui">
+        <div id="health-bar">
+            <div id="health-fill"></div>
+        </div>
+        
+        <div id="xp-bar">
+            <div id="xp-fill"></div>
+            <div id="xp-label">LVL: 1</div>
+        </div>
+        <div id="score">Score: 0</div>
+    </div>
+    <div id="joystick-zone"></div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/8.0.0/pixi.min.js"></script>
+    <script src="src/main.js" type="module"></script>
+</body>
+</html>
